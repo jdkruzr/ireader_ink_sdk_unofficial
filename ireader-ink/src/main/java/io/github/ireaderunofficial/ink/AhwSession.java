@@ -1,5 +1,7 @@
 package io.github.ireaderunofficial.ink;
 
+import android.content.Context;
+import android.eink.EPDCDevice;
 import android.eink.view.FBHandSurface;
 import android.eink.view.HWSurfaceView;
 import android.eink.view.IAhwTouchListenerV2;
@@ -20,6 +22,24 @@ import android.view.SurfaceView;
  */
 public final class AhwSession {
     private static final String TAG = "IReaderInk";
+
+    /**
+     * A SurfaceView whose holder binds a firmware handwriting surface on its first post after each
+     * {@code surfaceChanged}. Callers must have hidden-API exemptions in place first: the vendor
+     * {@code HWSurfaceView} reflects SurfaceView internals in its constructor.
+     */
+    public static SurfaceView createSurface(Context context) {
+        return new HWSurfaceView(context);
+    }
+
+    /** Display-wide, non-blocking panel refresh with an {@code EinkMode} value (see {@link IReaderInk}). */
+    public static void refresh(int mode) {
+        try {
+            EPDCDevice.forceRefresh(mode);
+        } catch (Throwable t) {
+            Log.w(TAG, "forceRefresh failed", t);
+        }
+    }
 
     private final Object token = new Object();
     private IFBHandSurface handle;

@@ -10,9 +10,10 @@ compile-time signatures and must be a `compileOnly` dependency.
 ## Modules
 
 - `ireader-ink`: the API.
-  - `IReaderInk`: availability check, `createSurface`, `refresh` and the pen-button erase property.
-  - `AhwSession`: binds a surface's firmware handwriting, with a transition-only gate, pen
-    configuration and an `AhwListener` for points and stroke ends.
+  - `IReaderInk`: availability check, system properties and the pen-button erase property. It
+    references no vendor types, so it's safe on any device and on the JVM.
+  - `AhwSession`: `createSurface` and `refresh`, plus binding a surface's firmware handwriting, with
+    a transition-only gate, pen configuration and an `AhwListener` for points and stroke ends.
 - `ireader-ink-stubs`: `android.eink.*` signatures copied from decompiled firmware. Never package it.
 
 ## Using It
@@ -33,7 +34,7 @@ implementation("io.github.ireaderunofficial:ireader-ink")
 if (IReaderInk.isAvailable()) {
     // HWSurfaceView reflects SurfaceView internals: install hidden-API exemptions first
     // (e.g. org.lsposed.hiddenapibypass).
-    val surface = IReaderInk.createSurface(context)
+    val surface = AhwSession.createSurface(context)
     val session = AhwSession()
     session.connect(surface, listener)   // gate starts closed
     // After surfaceChanged: post one frame (binds the firmware surface), then:

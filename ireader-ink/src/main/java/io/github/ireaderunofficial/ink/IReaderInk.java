@@ -1,20 +1,13 @@
 package io.github.ireaderunofficial.ink;
 
-import android.content.Context;
-import android.eink.EPDCDevice;
-import android.eink.view.HWSurfaceView;
-import android.util.Log;
-import android.view.SurfaceView;
 
 /**
  * Unofficial access to the iReader/Zhangyue firmware ink API ({@code android.eink.*}) that ships in
- * the boot classpath of iReader-platform e-ink devices (e.g. the Musnap Ocean). Nothing here is
- * packaged vendor code: the device provides the classes, this library only calls them. Every vendor
- * call is caught and logged.
+ * the boot classpath of iReader-platform e-ink devices (e.g. the Musnap Ocean). This class never
+ * references vendor types, so detection is safe on any device or JVM; surfaces, sessions and refreshes
+ * live in {@link AhwSession}.
  */
 public final class IReaderInk {
-    private static final String TAG = "IReaderInk";
-
     /** {@code EinkMode} value for a display-wide full GC16 refresh. */
     public static final int MODE_FULL_GC16 = 34;
     /** {@code EinkMode} value for a partial GC16 refresh. */
@@ -42,24 +35,6 @@ public final class IReaderInk {
      */
     public static boolean buttonErasesWithoutFirmwareInk() {
         return "true".equals(systemProperty("persist.button.erase.allow"));
-    }
-
-    /**
-     * A SurfaceView whose holder binds a firmware handwriting surface on its first post after each
-     * {@code surfaceChanged}. Callers must have hidden-API exemptions in place first: the vendor
-     * {@code HWSurfaceView} reflects SurfaceView internals in its constructor.
-     */
-    public static SurfaceView createSurface(Context context) {
-        return new HWSurfaceView(context);
-    }
-
-    /** Display-wide, non-blocking panel refresh with an {@code EinkMode} value. */
-    public static void refresh(int mode) {
-        try {
-            EPDCDevice.forceRefresh(mode);
-        } catch (Throwable t) {
-            Log.w(TAG, "forceRefresh failed", t);
-        }
     }
 
     /** Null when unreadable (JVM, or a ROM that blocks the hidden accessor). */
